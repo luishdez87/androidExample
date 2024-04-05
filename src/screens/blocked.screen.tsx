@@ -24,6 +24,15 @@ const BlockedScreen = ({navigation}) => {
     checkUnlockOptions();
   }, []);
 
+  useEffect(() => {
+    navigation.addListener('beforeRemove', e => {
+      e.preventDefault();
+      if (e.data.action.payload.name === 'homepage') {
+        navigation.dispatch(e.data.action);
+      }
+    });
+  }, [navigation]);
+
   const submitPin = () => {
     const checkPin = async () => {
       const existingPin = await EncryptedStorage.getItem('security_pin');

@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
   TouchableOpacity,
 } from 'react-native';
 import {calculateRunTime, parsePremieredDate} from '../utils/moment';
@@ -16,8 +15,9 @@ import {Episode, ParsedEpisodes} from '../models/episode';
 import {Show} from '../models/show';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useFavoritesStore} from '../stores/useFavorites';
-
-const {height} = Dimensions.get('screen');
+import DetailProperty from '../components/detail-property';
+import DetailImage from '../components/detail-image';
+import containerStyles from '../styles/container.styles';
 
 const Detail = ({route, navigation}: any) => {
   const {item} = route.params;
@@ -50,19 +50,17 @@ const Detail = ({route, navigation}: any) => {
     navigation.navigate('Episode', {item: episode});
   };
 
-  const handleFavoriteTap = (item: Show) => {
-    if (checkIsInFavorites(item.id)) {
-      onRemoveFavorite(item.id);
+  const handleFavoriteTap = (show: Show) => {
+    if (checkIsInFavorites(show.id)) {
+      onRemoveFavorite(show.id);
     } else {
-      onAddFavorite(item);
+      onAddFavorite(show);
     }
   };
 
   return (
-    <View style={style.mainContainer}>
-      <View style={style.imageContainer}>
-        <Image source={{uri: item.image.original}} style={style.image} />
-      </View>
+    <View style={containerStyles.mainContainer}>
+      <DetailImage image={item.image.original} />
       <View style={style.container}>
         <View style={style.header}>
           <View style={style.headerRow}>
@@ -76,14 +74,15 @@ const Detail = ({route, navigation}: any) => {
           </View>
           <View style={style.headerDetails}>
             <View style={style.statusCard}>
-              <Text>
-                <Text style={style.statusText}>Status:</Text> {item.status}{' '}
-              </Text>
-              <Text>
-                <Text style={style.statusText}>Duration:</Text>
-                {calculateRunTime(item)} days on air, since{' '}
-                {parsePremieredDate(item.premiered)}
-              </Text>
+              <DetailProperty label="Status: " value={`${item.status} `} />
+              <DetailProperty
+                label="Duration: "
+                value={`${calculateRunTime(item)} on air. `}
+              />
+              <DetailProperty
+                label="Premiered date: "
+                value={`${parsePremieredDate(item.premiered)} `}
+              />
             </View>
             <View style={style.genreContainer}>
               {item.genres.map((genre: string, index: number) => (
@@ -96,6 +95,12 @@ const Detail = ({route, navigation}: any) => {
         </View>
         <ScrollView style={style.scroll}>
           <View>
+            <DetailProperty
+              label="Network/countr: "
+              value={`${item.network.name}/${item.network.country.name}`}
+            />
+
+            <View style={{height: 10}} />
             <Text style={style.summaryTitle}>Summary</Text>
             <Text style={style.summary}>{summaryParser(item.summary)}</Text>
           </View>
@@ -131,12 +136,6 @@ const Detail = ({route, navigation}: any) => {
 };
 
 const style = StyleSheet.create({
-  mainContainer: {
-    flex: 1,
-  },
-  imageContainer: {
-    flex: 1,
-  },
   header: {
     flex: 0.5,
   },
@@ -167,10 +166,6 @@ const style = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 8,
-  },
-  image: {
-    flex: 1,
-    height: height * 0.3,
   },
   headerDetails: {
     flexDirection: 'column',

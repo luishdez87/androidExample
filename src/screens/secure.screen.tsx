@@ -11,6 +11,7 @@ import {
 import EncryptedStorage from 'react-native-encrypted-storage';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ReactNativeBiometrics, {BiometryTypes} from 'react-native-biometrics';
+import { StackActions } from '@react-navigation/native';
 
 const SWIPE_DISTANCE = Platform.OS === 'android' ? 50 : 100;
 
@@ -19,6 +20,7 @@ const SecureScreen = ({navigation}) => {
   const touchY = useRef(0);
   const dialPadContent = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'X'];
   const [pinExists, setPinExists] = useState(false);
+  const [isEditting, setIsEditting] = useState(false);
   const [pin, setPin] = useState<string>('');
   const [pinToShow, setPinToshow] = useState('');
   const [swiperStyle, setSwiperStyle] = useState({});
@@ -39,6 +41,7 @@ const SecureScreen = ({navigation}) => {
     const onlySavePin = async () => {
       await EncryptedStorage.setItem('security_pin', pin);
       setPinExists(true);
+      setIsEditting(false);
     };
 
     const savePinAndUseCredentials = async () => {
@@ -54,6 +57,7 @@ const SecureScreen = ({navigation}) => {
             JSON.stringify(true),
           );
           setPinExists(true);
+          setIsEditting(false);
         } else {
           console.log('user cancelled biometric prompt');
         }
@@ -103,7 +107,7 @@ const SecureScreen = ({navigation}) => {
       if (diffX > SWIPE_DISTANCE) {
         // I was trying to set an animation, but it seems very ugly hahaha
         setSwiperStyle({marginLeft: diffX});
-        navigation.navigate('blocked-screen');
+        navigation.dispatch(StackActions.replace('blocked-screen'));
       }
     },
     [navigation],
@@ -141,10 +145,15 @@ const SecureScreen = ({navigation}) => {
     );
   };
 
-  if (pinExists) {
+  if (pinExists && !isEditting) {
     return (
       <View style={style.container}>
-        <Text style={style.title}>Desliza para bloquear</Text>
+        <Text style={style.title}>Slide to lock</Text>
+        <TouchableOpacity
+          style={[style.saveButton, style.mtMd]}
+          onPress={() => setIsEditting(true)}>
+          <Text>Modify existing PIN</Text>
+        </TouchableOpacity>
         <View
           style={[style.slider]}
           onTouchStart={touchStart}
@@ -162,7 +171,8 @@ const SecureScreen = ({navigation}) => {
   return (
     <View style={style.container}>
       <Text style={style.title}>
-        Define a PIN and block your app to prevent unwanted intruders
+        {isEditting ? 'Modify your' : 'Define a'} PIN and block your app to
+        prevent unwanted intruders
       </Text>
       <View>
         <Text style={style.pinToShow}>{pinToShow}</Text>
@@ -235,6 +245,9 @@ const style = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 50,
     justifyContent: 'center',
+  },
+  mtMd: {
+    marginTop: 15,
   },
 });
 

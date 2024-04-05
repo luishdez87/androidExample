@@ -1,23 +1,18 @@
 import React from 'react';
-import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import {ScrollView, StyleSheet, Text, View} from 'react-native';
 import {summaryParser} from '../utils/summary';
+import textStyles from '../styles/text.styles';
+import DetailImage from '../components/detail-image';
 
 const EpisodeScreen = ({route}: any) => {
   const {item} = route.params;
 
   return (
     <View style={style.mainContainer}>
-      <Image
-        style={[style.imageContainer, style.image]}
-        source={{
-          uri: item.image
-            ? item.image.original
-            : 'https://www.vocaleurope.eu/wp-content/uploads/no-image.jpg',
-        }}
-      />
+      <DetailImage image={item.image.original} />
       <View style={style.container}>
         <View style={style.header}>
-          <Text style={style.name}>{item.name}</Text>
+          <Text style={textStyles.name}>{item.name}</Text>
           <View style={style.seasonEpisodeRow}>
             <Text>
               <Text style={style.bold}>Season: </Text>
@@ -46,12 +41,7 @@ const style = StyleSheet.create({
   mainContainer: {
     flex: 1,
   },
-  imageContainer: {
-    flex: 1,
-  },
-  image: {
-    flex: 1,
-  },
+
   container: {
     backgroundColor: 'white',
     paddingHorizontal: 12,

@@ -70,7 +70,11 @@ const People = ({navigation}: any) => {
 
   return (
     <View>
-      <TextInput placeholder="Buscar" value={query} onChangeText={setQuery} />
+      <TextInput
+        placeholder="Search..."
+        value={query}
+        onChangeText={setQuery}
+      />
       {people.length > 0 ? (
         <FlatList
           data={people}

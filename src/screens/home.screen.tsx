@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   View,
   Text,
-  Image,
   TextInput,
   FlatList,
   StyleSheet,
@@ -11,7 +10,9 @@ import {
 } from 'react-native';
 import {useShows} from '../hooks/useShows';
 import {Show} from '../models/show';
-import {parsePremieredDate} from '../utils/moment';
+import containerStyles from '../styles/container.styles';
+import RowImage from '../components/row-image';
+import ListItem from '../components/list-item';
 
 const Home = ({navigation}: any) => {
   const [page, setPage] = useState(1);
@@ -25,20 +26,9 @@ const Home = ({navigation}: any) => {
     };
 
     return (
-      <TouchableOpacity style={style.itemRow} onPress={goToDetail}>
-        <Image
-          style={style.itemImage}
-          source={{
-            uri: item.image
-              ? item.image.medium
-              : 'https://www.vocaleurope.eu/wp-content/uploads/no-image.jpg',
-          }}
-          alt="image"
-        />
-        <View>
-          <Text style={style.title}>{`${item.name}`}</Text>
-          <Text>{parsePremieredDate(item.premiered)}</Text>
-        </View>
+      <TouchableOpacity style={containerStyles.itemRow} onPress={goToDetail}>
+        <RowImage image={item.image.medium} />
+        <ListItem title={item.name} subtitle={item.premiered} />
       </TouchableOpacity>
     );
   };
@@ -66,7 +56,11 @@ const Home = ({navigation}: any) => {
 
   return (
     <View>
-      <TextInput placeholder="Buscar" value={query} onChangeText={setQuery} />
+      <TextInput
+        placeholder="Kitchen...."
+        value={query}
+        onChangeText={setQuery}
+      />
       {loading ? (
         <ActivityIndicator size="large" color="aaa" />
       ) : shows.length > 0 ? (
@@ -88,23 +82,6 @@ const Home = ({navigation}: any) => {
 };
 
 const style = StyleSheet.create({
-  itemRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    borderBottomColor: '#ddd',
-    borderBottomWidth: 1,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    gap: 15,
-  },
-  itemImage: {
-    height: 80,
-    width: 60,
-  },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
   loader: {
     marginVertical: 15,
     alignItems: 'center',
